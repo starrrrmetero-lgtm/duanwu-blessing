@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>端午安康 · 福运绵长</title>
+<style>
+  :root{
+    --paper:#F7F2E7;
+    --paper-deep:#EFE7D6;
+    --ink:#2F4A3C;
+    --ink-soft:#4C6B57;
+    --vermilion:#C8542A;
+    --moxa:#8FA876;
+    --gold:#D9A441;
+    --line: rgba(47,74,60,0.16);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0; padding:0; height:100%;}
+  body{
+    background:
+      radial-gradient(circle at 15% 8%, rgba(217,164,65,0.10), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(200,84,42,0.08), transparent 45%),
+      var(--paper);
+    font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    color: var(--ink);
+    overflow-x:hidden;
+    min-height:100%;
+  }
+
+  /* 纹理：竹席纹 */
+  .texture{
+    position:fixed; inset:0; pointer-events:none; opacity:0.05; z-index:0;
+    background-image: repeating-linear-gradient(45deg, var(--ink) 0, var(--ink) 1px, transparent 1px, transparent 14px),
+                       repeating-linear-gradient(-45deg, var(--ink) 0, var(--ink) 1px, transparent 1px, transparent 14px);
+  }
+
+  .wrap{ position:relative; z-index:1; max-width:480px; margin:0 auto; padding:0 0 60px; }
+
+  /* 顶部印章式标题 */
+  header{ padding:48px 28px 20px; text-align:center; }
+  .eyebrow{
+    font-size:12px; letter-spacing:6px; color: var(--ink-soft);
+    margin-bottom:14px; opacity:0.85;
+  }
+  .stamp{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:96px; height:96px; border:2.5px solid var(--vermilion);
+    border-radius:6px; color:var(--vermilion); font-size:34px;
+    transform: rotate(-3deg);
+    margin-bottom:18px;
+    font-weight:700;
+    writing-mode: vertical-rl;
+    letter-spacing:4px;
+    box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px rgba(200,84,42,0.25);
+  }
+  h1{
+    font-size:30px; margin:0 0 8px; letter-spacing:3px; font-weight:800;
+    color: var(--ink);
+  }
+  h1 span{ color:var(--vermilion); }
+  .subtitle{ font-size:14px; color:var(--ink-soft); letter-spacing:2px; }
+
+  .divider{
+    display:flex; align-items:center; gap:10px; margin:30px 28px 22px; opacity:0.6;
+  }
+  .divider::before, .divider::after{
+    content:""; flex:1; height:1px; background: var(--line);
+  }
+  .divider span{ font-size:12px; color:var(--ink-soft); letter-spacing:4px; white-space:nowrap; }
+
+  /* 互动核心区 */
+  .ritual{
+    margin:0 20px; padding:28px 22px 30px;
+    background: linear-gradient(180deg, #FFFDF8, var(--paper-deep));
+    border:1px solid var(--line); border-radius:18px;
+    box-shadow: 0 10px 30px rgba(47,74,60,0.08);
+    text-align:center;
+    position:relative;
+  }
+  .ritual-title{ font-size:17px; font-weight:700; margin-bottom:4px; }
+  .ritual-hint{ font-size:12.5px; color:var(--ink-soft); margin-bottom:22px; }
+
+  .zongzi-row{
+    display:flex; justify-content:center; gap:18px; margin-bottom:24px;
+  }
+  .zongzi{
+    width:56px; height:64px; cursor:pointer; user-select:none;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+    position:relative;
+  }
+  .zongzi svg{ width:100%; height:100%; display:block; filter: drop-shadow(0 4px 6px rgba(47,74,60,0.18)); }
+  .zongzi.tied{ transform: translateY(-4px) scale(1.05); }
+  .zongzi.tied .leaf{ fill:#7D9468; }
+  .zongzi:not(.tied):active{ transform: scale(0.92); }
+
+  .thread-progress{
+    width:100%; height:6px; background: var(--line); border-radius:3px; overflow:hidden;
+    margin-bottom:18px;
+  }
+  .thread-fill{
+    height:100%; width:0%; border-radius:3px;
+    background: linear-gradient(90deg, var(--gold), var(--vermilion));
+    transition: width .5s ease;
+  }
+
+  .wish-line{
+    min-height:48px; font-size:15px; line-height:1.7; color:var(--ink);
+    font-weight:600; padding:0 4px;
+    transition: opacity .4s ease;
+  }
+  .wish-line.empty{ color: var(--ink-soft); font-weight:400; font-size:13.5px; }
+
+  .reset-btn{
+    margin-top:16px; display:none; font-size:12px; color:var(--ink-soft);
+    border:1px solid var(--line); background:transparent; padding:7px 16px;
+    border-radius:20px; cursor:pointer;
+  }
+  .reset-btn.show{ display:inline-block; }
+
+  /* 完成态：祝福卡 */
+  .final-card{
+    margin-top:22px; padding:22px 18px; border-radius:14px;
+    background: var(--ink); color: var(--paper);
+    display:none; text-align:center;
+    animation: cardIn .6s ease;
+  }
+  .final-card.show{ display:block; }
+  @keyframes cardIn{ from{ opacity:0; transform: translateY(14px);} to{opacity:1; transform:none;} }
+  .final-card .fc-label{ font-size:11px; letter-spacing:4px; color: var(--gold); margin-bottom:10px; }
+  .final-card .fc-text{ font-size:18px; line-height:1.9; font-weight:700; }
+  .final-card .fc-sub{ margin-top:14px; font-size:12px; color: rgba(247,242,231,0.6); letter-spacing:2px; }
+
+  /* 祝福正文 */
+  .blessing-block{ margin:34px 28px 0; }
+  .blessing-block h2{
+    font-size:16px; margin:0 0 14px; display:flex; align-items:center; gap:10px;
+  }
+  .blessing-block h2 .dot{
+    width:7px; height:7px; border-radius:50%; background: var(--vermilion); flex-shrink:0;
+  }
+  .blessing-block p{
+    font-size:14.5px; line-height:2; color: var(--ink-soft); margin:0 0 26px;
+  }
+  .blessing-block p b{ color: var(--ink); font-weight:700; }
+
+  /* 双栏寄语：健康 / 事业 */
+  .pair{ display:flex; gap:14px; margin:0 28px 30px; }
+  .pair-card{
+    flex:1; background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:18px 14px; text-align:center;
+  }
+  .pair-card .icon{ font-size:26px; margin-bottom:8px; display:block; }
+  .pair-card .title{ font-size:13.5px; font-weight:700; margin-bottom:6px; }
+  .pair-card .desc{ font-size:12px; color: var(--ink-soft); line-height:1.6; }
+
+  /* 落款 */
+  footer{
+    text-align:center; padding:36px 28px 10px; color: var(--ink-soft);
+    font-size:12px; letter-spacing:2px; line-height:2;
+  }
+  footer .seal{ font-size:20px; color: var(--vermilion); margin-bottom:8px; }
+
+  /* 漂浮粽叶/龙舟点缀 */
+  .float-deco{
+    position:fixed; pointer-events:none; z-index:0; opacity:0.5;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="texture"></div>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">乙巳年 · 五月初五</div>
+    <div class="stamp">安康</div>
+    <h1>端午<span>安康</span></h1>
+    <div class="subtitle">愿粽叶包住平安，绳结系住兴旺</div>
+  </header>
+
+  <div class="divider"><span>为爸妈系上祈福绳</span></div>
+
+  <div class="ritual">
+    <div class="ritual-title">点一点粽子，亲手系上五彩绳</div>
+    <div class="ritual-hint">每点亮一只，便解开一句心里话</div>
+
+    <div class="zongzi-row" id="zongziRow"></div>
+
+    <div class="thread-progress"><div class="thread-fill" id="threadFill"></div></div>
+
+    <div class="wish-line empty" id="wishLine">轻轻点击上方的粽子吧</div>
+
+    <div class="final-card" id="finalCard">
+      <div class="fc-label">五 彩 绳 已 系 满</div>
+      <div class="fc-text">愿爸妈安康喜乐，<br>生意兴旺，财源广进</div>
+      <div class="fc-sub">— 来自孩子的端午祝福 —</div>
+    </div>
+
+    <button class="reset-btn" id="resetBtn">重新系一遍</button>
+  </div>
+
+  <div class="blessing-block">
+    <h2><span class="dot"></span>写给爸妈</h2>
+    <p>端午将至，艾草香起。又是一年粽叶飘香的日子，<b>愿爸妈身体安康，万事顺遂</b>。这一年辛苦了，往后的日子，希望你们能多歇一歇，少一点操劳，多一点笑意。</p>
+    <p>家里的生意，也愿它如这江上龙舟，<b>劈波斩浪、一路向前</b>；如门前艾草，<b>枝繁叶茂、生生不息</b>。所求不多，只盼平安顺心，福气常伴左右。</p>
+  </div>
+
+  <div class="pair">
+    <div class="pair-card">
+      <span class="icon">🌿</span>
+      <div class="title">安康常在</div>
+      <div class="desc">愿身体康健<br>百病不侵<br>笑口常开</div>
+    </div>
+    <div class="pair-card">
+      <span class="icon">🐉</span>
+      <div class="title">生意兴隆</div>
+      <div class="desc">愿财源滚滚<br>生意红火<br>步步高升</div>
+    </div>
+  </div>
+
+  <div class="divider"><span>端 午 安 康</span></div>
+
+  <footer>
+    <div class="seal">㊗</div>
+    祝爸爸妈妈<br>端午安康，阖家欢乐
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const wishes = [
+    "第一缕粽香，愿您平安喜乐。",
+    "第二缕粽香，愿您身体康健。",
+    "第三缕粽香，愿生意兴隆，财源广进。",
+    "第四缕粽香，愿家宅安宁，岁岁无忧。",
+    "第五缕粽香，五彩绳系满，福气满满归家门。"
+  ];
+
+  const row = document.getElementById('zongziRow');
+  const fill = document.getElementById('threadFill');
+  const wishLine = document.getElementById('wishLine');
+  const finalCard = document.getElementById('finalCard');
+  const resetBtn = document.getElementById('resetBtn');
+
+  const colors = ['#C8542A','#D9A441','#8FA876','#2F4A3C','#C8542A'];
+
+  function zongziSVG(idx){
+    return `<svg viewBox="0 0 56 64" xmlns="http://www.w3.org/2000/svg">
+      <polygon class="leaf" points="28,4 50,40 28,60 6,40" fill="#9CB088"/>
+      <polygon points="28,4 50,40 28,38" fill="#84996f" opacity="0.55"/>
+      <polygon points="28,4 6,40 28,38" fill="#aebf99" opacity="0.55"/>
+      <line x1="28" y1="4" x2="28" y2="60" stroke="#5e7350" stroke-width="1" opacity="0.4"/>
+      <path class="thread" d="M14,30 Q28,22 42,30" stroke="${colors[idx]}" stroke-width="0" fill="none" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  let tiedCount = 0;
+  const items = [];
+
+  for(let i=0;i<5;i++){
+    const div = document.createElement('div');
+    div.className = 'zongzi';
+    div.innerHTML = zongziSVG(i);
+    div.dataset.index = i;
+    row.appendChild(div);
+    items.push(div);
+
+    div.addEventListener('click', () => {
+      if(div.classList.contains('tied')) return;
+      div.classList.add('tied');
+      const path = div.querySelector('.thread');
+      path.setAttribute('stroke-width','3');
+
+      tiedCount++;
+      fill.style.width = (tiedCount/5*100) + '%';
+
+      wishLine.classList.remove('empty');
+      wishLine.textContent = wishes[tiedCount-1];
+
+      if(tiedCount === 5){
+        setTimeout(() => {
+          finalCard.classList.add('show');
+          resetBtn.classList.add('show');
+        }, 450);
+      }
+    });
+  }
+
+  resetBtn.addEventListener('click', () => {
+    tiedCount = 0;
+    fill.style.width = '0%';
+    wishLine.classList.add('empty');
+    wishLine.textContent = '轻轻点击上方的粽子吧';
+    finalCard.classList.remove('show');
+    resetBtn.classList.remove('show');
+    items.forEach(div => {
+      div.classList.remove('tied');
+      div.querySelector('.thread').setAttribute('stroke-width','0');
+    });
+  });
+})();
+</script>
+</body>
+</html>
