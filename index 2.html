@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>父亲节快乐 · 老物件里的话</title>
+<style>
+  :root{
+    --ink:#2B2118;
+    --ink-soft:#6B5B4D;
+    --rust:#B5562F;
+    --mustard:#C99A3D;
+    --paper:#F6F0E4;
+    --paper-deep:#ECE1CB;
+    --line: rgba(43,33,24,0.14);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0; padding:0; height:100%;}
+  body{
+    background:
+      radial-gradient(circle at 14% 8%, rgba(201,154,61,0.12), transparent 42%),
+      radial-gradient(circle at 88% 92%, rgba(181,86,47,0.08), transparent 46%),
+      var(--paper);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    color: var(--ink);
+    overflow-x:hidden;
+    min-height:100%;
+  }
+  .texture{
+    position:fixed; inset:0; pointer-events:none; opacity:0.05; z-index:0;
+    background-image: repeating-linear-gradient(90deg, var(--ink) 0, var(--ink) 1px, transparent 1px, transparent 18px);
+  }
+  .wrap{ position:relative; z-index:1; max-width:480px; margin:0 auto; padding:0 0 60px; }
+
+  header{ padding:48px 28px 20px; text-align:center; }
+  .eyebrow{ font-size:12px; letter-spacing:6px; color:var(--ink-soft); margin-bottom:14px; opacity:0.85; }
+  .stamp{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:96px; height:96px; border:2.5px solid var(--rust);
+    border-radius:6px; color:var(--rust); font-size:34px;
+    transform: rotate(-3deg); margin-bottom:18px; font-weight:700;
+    writing-mode: vertical-rl; letter-spacing:4px;
+    box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px rgba(181,86,47,0.22);
+  }
+  h1{ font-size:30px; margin:0 0 8px; letter-spacing:3px; font-weight:800; color:var(--ink); }
+  h1 span{ color:var(--rust); }
+  .subtitle{ font-size:14px; color:var(--ink-soft); letter-spacing:2px; }
+
+  .divider{ display:flex; align-items:center; gap:10px; margin:30px 28px 18px; opacity:0.6; }
+  .divider::before,.divider::after{ content:""; flex:1; height:1px; background:var(--line); }
+  .divider span{ font-size:12px; color:var(--ink-soft); letter-spacing:4px; white-space:nowrap; }
+
+  /* ---------- 翻牌区 ---------- */
+  .flip-section{ margin:0 20px; }
+  .flip-hint{ text-align:center; font-size:12.5px; color:var(--ink-soft); margin-bottom:6px; }
+  .flip-progress{ text-align:center; font-size:12px; color:var(--rust); font-weight:700; margin-bottom:16px; letter-spacing:1px; }
+
+  .flip-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+  }
+  .flip-card{
+    aspect-ratio: 1/1.08; perspective:800px; cursor:pointer;
+  }
+  .flip-card-inner{
+    position:relative; width:100%; height:100%; transition: transform .6s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .flip-card.flipped .flip-card-inner{ transform: rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; backface-visibility:hidden;
+    border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:8px;
+  }
+  .flip-front{
+    background: linear-gradient(160deg, #fff, var(--paper-deep));
+    border:1px solid var(--line);
+  }
+  .flip-front .icon{ font-size:26px; margin-bottom:4px; }
+  .flip-front .name{ font-size:10.5px; color:var(--ink-soft); letter-spacing:1px; }
+  .flip-back{
+    background: var(--ink); color: var(--paper);
+    transform: rotateY(180deg);
+    font-size:11px; line-height:1.55; text-align:center;
+  }
+  .flip-back .back-icon{ font-size:18px; margin-bottom:4px; opacity:0.85; }
+
+  /* ---------- 抽签区 ---------- */
+  .draw-section{
+    margin:26px 20px 0; padding:26px 20px 28px;
+    background: linear-gradient(180deg, #FFFDF8, var(--paper-deep));
+    border:1px solid var(--line); border-radius:18px;
+    text-align:center; opacity:0.35; pointer-events:none; transition: opacity .5s ease;
+    box-shadow: 0 10px 30px rgba(43,33,24,0.06);
+  }
+  .draw-section.unlocked{ opacity:1; pointer-events:auto; }
+  .draw-title{ font-size:15px; font-weight:700; margin-bottom:4px; }
+  .draw-hint{ font-size:12px; color:var(--ink-soft); margin-bottom:20px; }
+
+  .stick-box{
+    width:64px; height:130px; margin:0 auto 18px; position:relative;
+  }
+  .stick{
+    position:absolute; left:50%; top:0; width:10px; height:120px;
+    background: linear-gradient(180deg, var(--mustard), #A87A2E);
+    border-radius:4px; transform-origin:bottom center;
+    transform: translateX(-50%) rotate(0deg);
+    transition: transform .45s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: 0 4px 8px rgba(43,33,24,0.18);
+  }
+  .stick.draw-anim{ animation: stickPull .45s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes stickPull{
+    0%{ transform: translateX(-50%) rotate(0deg) translateY(0); }
+    40%{ transform: translateX(-50%) rotate(-14deg) translateY(-14px); }
+    100%{ transform: translateX(-50%) rotate(-6deg) translateY(-6px); }
+  }
+
+  .draw-text{
+    min-height:56px; font-size:15px; font-weight:700; line-height:1.7; color:var(--ink);
+    padding:0 6px; margin-bottom:18px;
+  }
+  .draw-text.empty{ color:var(--ink-soft); font-weight:400; font-size:13px; }
+
+  .draw-btn{
+    font-size:13px; color:#fff; background:var(--rust); border:none;
+    padding:10px 26px; border-radius:22px; cursor:pointer; letter-spacing:2px;
+    box-shadow: 0 6px 14px rgba(181,86,47,0.3);
+  }
+  .draw-btn:active{ transform: scale(0.96); }
+
+  .keep-btn{
+    display:none; margin-top:12px; font-size:12px; color:var(--ink-soft);
+    background:transparent; border:1px solid var(--line); padding:7px 16px;
+    border-radius:20px; cursor:pointer;
+  }
+  .keep-btn.show{ display:inline-block; }
+
+  .final-card{
+    margin-top:18px; padding:22px 18px; border-radius:14px;
+    background: var(--ink); color: var(--paper); display:none; text-align:center;
+    animation: cardIn .6s ease;
+  }
+  .final-card.show{ display:block; }
+  @keyframes cardIn{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:none;} }
+  .final-card .fc-label{ font-size:11px; letter-spacing:4px; color:var(--mustard); margin-bottom:10px; }
+  .final-card .fc-text{ font-size:17px; line-height:1.85; font-weight:700; }
+  .final-card .fc-sub{ margin-top:14px; font-size:12px; color:rgba(246,240,228,0.6); letter-spacing:2px; }
+
+  /* ---------- 文字区 ---------- */
+  .blessing-block{ margin:34px 28px 0; }
+  .blessing-block h2{ font-size:16px; margin:0 0 14px; display:flex; align-items:center; gap:10px; }
+  .blessing-block h2 .dot{ width:7px; height:7px; border-radius:50%; background:var(--rust); flex-shrink:0; }
+  .blessing-block p{ font-size:14.5px; line-height:2; color:var(--ink-soft); margin:0 0 26px; }
+  .blessing-block p b{ color:var(--ink); font-weight:700; }
+
+  .pair{ display:flex; gap:14px; margin:0 28px 30px; }
+  .pair-card{ flex:1; background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 14px; text-align:center; }
+  .pair-card .icon{ font-size:26px; margin-bottom:8px; display:block; }
+  .pair-card .title{ font-size:13.5px; font-weight:700; margin-bottom:6px; }
+  .pair-card .desc{ font-size:12px; color:var(--ink-soft); line-height:1.6; }
+
+  footer{ text-align:center; padding:36px 28px 10px; color:var(--ink-soft); font-size:12px; letter-spacing:2px; line-height:2; }
+  footer .seal{ font-size:20px; color:var(--rust); margin-bottom:8px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="texture"></div>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">六 月 第 三 个 星 期 日</div>
+    <div class="stamp">靠山</div>
+    <h1>父亲节<span>快乐</span></h1>
+    <div class="subtitle">翻开老物件，抽一句说不出口的话</div>
+  </header>
+
+  <div class="divider"><span>翻一翻，唤醒爸爸的老物件</span></div>
+
+  <div class="flip-section">
+    <div class="flip-hint">点击卡片翻面，每件物件都有一句话</div>
+    <div class="flip-progress" id="flipProgress">已唤醒 0 / 6</div>
+    <div class="flip-grid" id="flipGrid"></div>
+  </div>
+
+  <div class="divider"><span>抽 一 句 父 亲 节 祝 福 签</span></div>
+
+  <div class="draw-section" id="drawSection">
+    <div class="draw-title">六件老物件都翻开后解锁</div>
+    <div class="draw-hint">手气不好可以重新抽，直到抽到最想说的那句</div>
+
+    <div class="stick-box"><div class="stick" id="stick"></div></div>
+
+    <div class="draw-text empty" id="drawText">点击下方按钮抽一支祝福签</div>
+
+    <button class="draw-btn" id="drawBtn">抽 签</button>
+    <br>
+    <button class="keep-btn" id="keepBtn">就这一句啦</button>
+
+    <div class="final-card" id="finalCard">
+      <div class="fc-label">这 一 句 · 送 给 爸 爸</div>
+      <div class="fc-text" id="finalText"></div>
+      <div class="fc-sub">— 来自孩子的父亲节祝福 —</div>
+    </div>
+  </div>
+
+  <div class="blessing-block">
+    <h2><span class="dot"></span>写给爸爸</h2>
+    <p>家里那些用旧了的东西，扳手、紫陶杯、用了多年的旧电脑，您舍不得换，我们却总记得它们背后的故事。<b>谢谢您把最好的都留给了家</b>，自己的那份，悄悄省了又省。</p>
+    <p>这个父亲节，没什么大礼物，<b>只想替您翻一翻那些旧时光</b>，再抽一句藏了很久的话给您听——爸，辛苦了，这碗饭吃了这么多年，往后换我们多帮您下厨。</p>
+  </div>
+
+  <div class="pair">
+    <div class="pair-card">
+      <span class="icon">🔧</span>
+      <div class="title">健康常安</div>
+      <div class="desc">愿身体康健<br>步履稳健<br>笑口常开</div>
+    </div>
+    <div class="pair-card">
+      <span class="icon">🌅</span>
+      <div class="title">万事顺意</div>
+      <div class="desc">愿诸事顺遂<br>心境豁达<br>岁岁无忧</div>
+    </div>
+  </div>
+
+  <div class="divider"><span>父 亲 节 快 乐</span></div>
+
+  <footer>
+    <div class="seal">㊗</div>
+    祝爸爸<br>父亲节快乐，平安喜乐
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const items = [
+    { icon:'🥮', name:'詹记桃酥', back:'每次都记得给我留一盒，自己倒舍不得多吃。' },
+    { icon:'🍵', name:'建水紫陶杯', back:'那只杯子被您养得越来越亮，比谁都细心。' },
+    { icon:'🖼️', name:'全家福', back:'照片里您还年轻，时间过得真快。' },
+    { icon:'🔧', name:'扳手', back:'家里坏的东西，到您手里总能修好。' },
+    { icon:'💻', name:'工作的旧电脑', back:'用了这么多年也不肯换，键盘都磨亮了。' },
+    { icon:'🍲', name:'锅碗瓢盆', back:'家里的饭，一直都是您在做。' }
+  ];
+
+  const flipGrid = document.getElementById('flipGrid');
+  const flipProgress = document.getElementById('flipProgress');
+  const drawSection = document.getElementById('drawSection');
+  let flippedCount = 0;
+  const flippedSet = new Set();
+
+  items.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.innerHTML = `
+      <div class="flip-card-inner">
+        <div class="flip-face flip-front">
+          <div class="icon">${item.icon}</div>
+          <div class="name">${item.name}</div>
+        </div>
+        <div class="flip-face flip-back">
+          <div class="back-icon">${item.icon}</div>
+          <div>${item.back}</div>
+        </div>
+      </div>
+    `;
+    card.addEventListener('click', () => {
+      card.classList.toggle('flipped');
+      if(card.classList.contains('flipped') && !flippedSet.has(idx)){
+        flippedSet.add(idx);
+        flippedCount++;
+        flipProgress.textContent = '已唤醒 ' + flippedCount + ' / 6';
+        if(flippedCount === 6){
+          setTimeout(() => drawSection.classList.add('unlocked'), 300);
+        }
+      }
+    });
+    flipGrid.appendChild(card);
+  });
+
+  // 抽签逻辑
+  const blessings = [
+    '愿爸爸身体健健康康，少操心，多歇息。',
+    '愿爸爸的白发，都换成了我们的懂事。',
+    '愿您一直走在路上，也一直有人等您回家。',
+    '愿往后的日子，换我们陪您慢慢变老。',
+    '愿您不再说"我没事"，累了就歇一歇。',
+    '愿爸爸笑口常开，烦心事都绕道走。',
+    '愿您依然是我们心里那座，最稳的山。',
+    '愿岁月放慢脚步，多留些时光给您。'
+  ];
+
+  const stick = document.getElementById('stick');
+  const drawText = document.getElementById('drawText');
+  const drawBtn = document.getElementById('drawBtn');
+  const keepBtn = document.getElementById('keepBtn');
+  const finalCard = document.getElementById('finalCard');
+  const finalText = document.getElementById('finalText');
+
+  let lastIdx = -1;
+  let currentWish = '';
+
+  drawBtn.addEventListener('click', () => {
+    stick.classList.remove('draw-anim');
+    void stick.offsetWidth;
+    stick.classList.add('draw-anim');
+
+    let idx;
+    do { idx = Math.floor(Math.random() * blessings.length); } while(idx === lastIdx && blessings.length > 1);
+    lastIdx = idx;
+    currentWish = blessings[idx];
+
+    setTimeout(() => {
+      drawText.classList.remove('empty');
+      drawText.textContent = currentWish;
+      keepBtn.classList.add('show');
+      finalCard.classList.remove('show');
+    }, 200);
+  });
+
+  keepBtn.addEventListener('click', () => {
+    finalText.textContent = currentWish;
+    finalCard.classList.add('show');
+  });
+})();
+</script>
+</body>
+</html>
